@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".PhotosActivity"
-            android:label="@string/app_name" >
+            android:label="Popular Photos" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
