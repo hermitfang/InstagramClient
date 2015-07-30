@@ -1,6 +1,7 @@
 package com.hermitfang.instagramclient;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -23,15 +24,32 @@ public class PhotosActivity extends ActionBarActivity {
     public static final String CLIENT_ID = "966c023997bd4b38a7e0fce453fe1965";
     private ArrayList<InstagramPhoto> photos;
     private InstagramPhotosAdapter adapterPhotos;
-    // private SwipeRefreshLayout srSwipe;
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photos);
 
+        // swipe to refresh
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                fetchPopularPhotos();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         // search "Android async http" -- the library helps to get api via http in async way
-            // compile 'com.loopj.android:android-async-http:1.4.8'
+        // compile 'com.loopj.android:android-async-http:1.4.8'
         photos = new ArrayList<>();
         adapterPhotos = new InstagramPhotosAdapter(this, photos);
         ListView lvPhotos = (ListView) findViewById(R.id.lvPhotos);
@@ -64,6 +82,7 @@ public class PhotosActivity extends ActionBarActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // super.onSuccess(statusCode, headers, response);
                 Log.i("DEBUG", response.toString());
+                adapterPhotos.clear();
 
                 JSONArray photosJ = null;
                 try {
@@ -100,6 +119,7 @@ public class PhotosActivity extends ActionBarActivity {
                 }
 
                 adapterPhotos.notifyDataSetChanged();
+                swipeContainer.setRefreshing(false);
             }
 
             @Override
